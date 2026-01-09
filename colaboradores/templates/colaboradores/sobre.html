@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sobre{% endblock %}
+
+{% block content %}
+<div class="card" style="max-width: 600px; margin: 0 auto;">
+    <div class="card-header">
+        <span class="material-symbols-outlined">info</span>
+        <span>Sobre o Sistema</span>
+    </div>
+
+    <div class="card-body text-center">
+        <div style="margin-bottom: 30px;">
+            <span class="material-symbols-outlined" style="font-size: 80px; color: var(--cor-primaria);">groups</span>
+            <h1 style="font-size: 28px; color: var(--cor-primaria); margin: 15px 0;">Gestão de RH</h1>
+            <p class="text-secondary">Sistema de Gestão de Recursos Humanos</p>
+        </div>
+
+        <div class="section">
+            <div class="section-header">Informações</div>
+            <div class="section-content">
+                <table style="width: 100%;">
+                    <tr>
+                        <td style="padding: 8px; text-align: right; color: var(--cor-texto-secundario);">Versão:</td>
+                        <td style="padding: 8px; font-weight: 600;">1.05</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; text-align: right; color: var(--cor-texto-secundario);">Framework:</td>
+                        <td style="padding: 8px;">Django 6.0</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; text-align: right; color: var(--cor-texto-secundario);">Banco de Dados:</td>
+                        <td style="padding: 8px;">MySQL</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 8px; text-align: right; color: var(--cor-texto-secundario);">Desenvolvedor:</td>
+                        <td style="padding: 8px;">RENOVO</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div class="section mt-3">
+            <div class="section-header">Funcionalidades</div>
+            <div class="section-content" style="text-align: left;">
+                <ul style="list-style: disc; padding-left: 20px; color: var(--cor-texto-secundario);">
+                    <li>Cadastro completo de colaboradores</li>
+                    <li>Gestão de contratos de experiência</li>
+                    <li>Controle de férias e períodos concessivos</li>
+                    <li>Gestão de dependentes</li>
+                    <li>Controle de localizações e alocações</li>
+                    <li>Dashboard com indicadores de RH</li>
+                    <li>Exportação de relatórios em Excel</li>
+                    <li>Block-list de ex-funcionários</li>
+                    <li>Log de alterações do sistema</li>
+                </ul>
+            </div>
+        </div>
+
+        <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid var(--cor-cinza-claro);">
+            <p class="text-secondary" style="font-size: 12px;">
+                &copy; 2026 RENOVO - Todos os direitos reservados
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

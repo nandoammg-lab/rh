@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Relatório de Localizações{% endblock %}
+
+{% block content %}
+<div class="table-container">
+    <div class="table-header">
+        <div class="table-title">
+            <span class="material-symbols-outlined">location_on</span>
+            <span>Relatório de Localizações</span>
+        </div>
+
+        <div class="table-controls">
+            <a href="{% url 'colaboradores:colaborador_list' %}" class="btn btn-outline">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Voltar
+            </a>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Local</th>
+                <th>Cidade/UF</th>
+                <th>Colaborador</th>
+                <th>Empresa</th>
+                <th>Data Início</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for loc in localizacoes %}
+            <tr>
+                <td>{{ loc.local_nome }}</td>
+                <td>{{ loc.cidade|default:"" }}/{{ loc.uf|default:"-" }}</td>
+                <td>
+                    <a href="{% url 'colaboradores:colaborador_detail' loc.colaborador.pk %}">
+                        {{ loc.colaborador.nome_completo }}
+                    </a>
+                </td>
+                <td>{{ loc.colaborador.empresa.razao_social|default:"-" }}</td>
+                <td>{{ loc.data_inicio|date:"d/m/Y" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center" style="padding: 40px;">
+                    <span class="material-symbols-outlined" style="font-size: 48px; color: var(--cor-cinza-claro);">location_off</span>
+                    <p class="mt-2 text-secondary">Nenhuma localização ativa encontrada.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

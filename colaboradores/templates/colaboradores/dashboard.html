@@ -1,0 +1,341 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <span class="material-symbols-outlined">analytics</span>
+        <span>Dashboard - Análise de Recursos Humanos</span>
+    </div>
+
+    <div class="card-body">
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tabs-header">
+                <button type="button" class="tab-btn active" data-tab="tab-visao">Visão Geral</button>
+                <button type="button" class="tab-btn" data-tab="tab-quadro">Quadro de Pessoal</button>
+                <button type="button" class="tab-btn" data-tab="tab-contratos">Contratos & Férias</button>
+                <button type="button" class="tab-btn" data-tab="tab-demografia">Demografia</button>
+            </div>
+
+            <!-- Tab: Visão Geral -->
+            <div class="tab-content active" id="tab-visao">
+                <div class="kpi-grid">
+                    <div class="kpi-card">
+                        <div class="kpi-icon">
+                            <span class="material-symbols-outlined">people</span>
+                        </div>
+                        <div class="kpi-info">
+                            <h3>Colaboradores Ativos</h3>
+                            <span class="kpi-value">{{ total_ativos }}</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon">
+                            <span class="material-symbols-outlined">business</span>
+                        </div>
+                        <div class="kpi-info">
+                            <h3>Empresas Ativas</h3>
+                            <span class="kpi-value">{{ total_empresas }}</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background-color: #fff3e0;">
+                            <span class="material-symbols-outlined" style="color: var(--cor-alerta);">schedule</span>
+                        </div>
+                        <div class="kpi-info">
+                            <h3>Contratos Vencendo (30d)</h3>
+                            <span class="kpi-value" style="color: var(--cor-alerta);">{{ contratos_vencendo }}</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background-color: #fce4ec;">
+                            <span class="material-symbols-outlined" style="color: var(--cor-erro);">beach_access</span>
+                        </div>
+                        <div class="kpi-info">
+                            <h3>Férias Vencendo (90d)</h3>
+                            <span class="kpi-value" style="color: var(--cor-erro);">{{ ferias_vencendo }}</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background-color: #e8f5e9;">
+                            <span class="material-symbols-outlined" style="color: var(--cor-sucesso);">flight_takeoff</span>
+                        </div>
+                        <div class="kpi-info">
+                            <h3>Em Férias Agora</h3>
+                            <span class="kpi-value" style="color: var(--cor-sucesso);">{{ em_ferias }}</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon">
+                            <span class="material-symbols-outlined">payments</span>
+                        </div>
+                        <div class="kpi-info">
+                            <h3>Salário Médio</h3>
+                            <span class="kpi-value">R$ {{ salario_medio|floatformat:2|default:"0,00" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon">
+                            <span class="material-symbols-outlined">account_balance_wallet</span>
+                        </div>
+                        <div class="kpi-info">
+                            <h3>Folha Total</h3>
+                            <span class="kpi-value">R$ {{ folha_total|floatformat:2|default:"0,00" }}</span>
+                        </div>
+                    </div>
+
+                    <div class="kpi-card">
+                        <div class="kpi-icon" style="background-color: #f3e5f5;">
+                            <span class="material-symbols-outlined" style="color: #7b1fa2;">cake</span>
+                        </div>
+                        <div class="kpi-info">
+                            <h3>Aniversariantes do Mês</h3>
+                            <span class="kpi-value" style="color: #7b1fa2;">{{ aniversariantes_mes }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Quadro de Pessoal -->
+            <div class="tab-content" id="tab-quadro">
+                <div class="dashboard-grid">
+                    <!-- Por Empresa -->
+                    <div class="chart-container">
+                        <h3 class="chart-title">Colaboradores por Empresa</h3>
+                        <div class="bar-chart">
+                            {% for item in por_empresa %}
+                            <div class="bar-item">
+                                <span class="bar-label" title="{{ item.empresa__razao_social }}">{{ item.empresa__razao_social|truncatechars:20 }}</span>
+                                <div class="bar-container">
+                                    <div class="bar-fill" style="width: {% widthratio item.total max_empresa 100 %}%; background-color: var(--cor-secundaria);"></div>
+                                </div>
+                                <span class="bar-value">{{ item.total }}</span>
+                            </div>
+                            {% empty %}
+                            <p class="text-secondary text-center">Sem dados</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Por Localização -->
+                    <div class="chart-container">
+                        <h3 class="chart-title">Colaboradores por Localização</h3>
+                        <div class="bar-chart">
+                            {% for item in por_localizacao %}
+                            <div class="bar-item">
+                                <span class="bar-label" title="{{ item.local_nome }}">{{ item.local_nome|truncatechars:20 }}</span>
+                                <div class="bar-container">
+                                    <div class="bar-fill" style="width: {% widthratio item.total max_localizacao 100 %}%; background-color: var(--cor-sucesso);"></div>
+                                </div>
+                                <span class="bar-value">{{ item.total }}</span>
+                            </div>
+                            {% empty %}
+                            <p class="text-secondary text-center">Sem dados</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Por Função -->
+                    <div class="chart-container">
+                        <h3 class="chart-title">Colaboradores por Função (Top 10)</h3>
+                        <div class="bar-chart">
+                            {% for item in por_funcao %}
+                            <div class="bar-item">
+                                <span class="bar-label" title="{{ item.funcao }}">{{ item.funcao|truncatechars:20 }}</span>
+                                <div class="bar-container">
+                                    <div class="bar-fill" style="width: {% widthratio item.total max_funcao 100 %}%; background-color: var(--cor-alerta);"></div>
+                                </div>
+                                <span class="bar-value">{{ item.total }}</span>
+                            </div>
+                            {% empty %}
+                            <p class="text-secondary text-center">Sem dados</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Por Departamento -->
+                    <div class="chart-container">
+                        <h3 class="chart-title">Colaboradores por Departamento</h3>
+                        <div class="bar-chart">
+                            {% for item in por_departamento %}
+                            <div class="bar-item">
+                                <span class="bar-label" title="{{ item.departamento }}">{{ item.departamento|truncatechars:20 }}</span>
+                                <div class="bar-container">
+                                    <div class="bar-fill" style="width: {% widthratio item.total max_departamento 100 %}%; background-color: var(--cor-primaria);"></div>
+                                </div>
+                                <span class="bar-value">{{ item.total }}</span>
+                            </div>
+                            {% empty %}
+                            <p class="text-secondary text-center">Sem dados</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Contratos & Férias -->
+            <div class="tab-content" id="tab-contratos">
+                <div class="dashboard-grid">
+                    <!-- Contratos Vencendo -->
+                    <div class="chart-container">
+                        <h3 class="chart-title">
+                            <span class="material-symbols-outlined" style="color: var(--cor-alerta);">schedule</span>
+                            Contratos de Experiência Vencendo (30 dias)
+                        </h3>
+                        {% if contratos_lista %}
+                        <table style="width: 100%;">
+                            <thead style="background: var(--cor-fundo);">
+                                <tr>
+                                    <th style="padding: 8px;">Nome</th>
+                                    <th style="padding: 8px;">Empresa</th>
+                                    <th style="padding: 8px;">Vencimento</th>
+                                    <th style="padding: 8px;">Dias</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for c in contratos_lista %}
+                                <tr>
+                                    <td style="padding: 8px;">{{ c.colaborador.nome_completo }}</td>
+                                    <td style="padding: 8px;">{{ c.colaborador.empresa.razao_social|default:"-" }}</td>
+                                    <td style="padding: 8px;">{{ c.data_fim_inicial|date:"d/m/Y" }}</td>
+                                    <td style="padding: 8px;">
+                                        <span class="badge {% if c.dias_restantes <= 5 %}badge-danger{% else %}badge-warning{% endif %}">
+                                            {{ c.dias_restantes }}d
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-secondary text-center" style="padding: 20px;">Nenhum contrato vencendo nos próximos 30 dias.</p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Férias Vencendo -->
+                    <div class="chart-container">
+                        <h3 class="chart-title">
+                            <span class="material-symbols-outlined" style="color: var(--cor-erro);">beach_access</span>
+                            Férias Vencendo (90 dias)
+                        </h3>
+                        {% if ferias_lista %}
+                        <table style="width: 100%;">
+                            <thead style="background: var(--cor-fundo);">
+                                <tr>
+                                    <th style="padding: 8px;">Nome</th>
+                                    <th style="padding: 8px;">Empresa</th>
+                                    <th style="padding: 8px;">Limite</th>
+                                    <th style="padding: 8px;">Dias</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for f in ferias_lista %}
+                                <tr>
+                                    <td style="padding: 8px;">{{ f.colaborador.nome_completo }}</td>
+                                    <td style="padding: 8px;">{{ f.colaborador.empresa.razao_social|default:"-" }}</td>
+                                    <td style="padding: 8px;">{{ f.periodo_concessivo_limite|date:"d/m/Y" }}</td>
+                                    <td style="padding: 8px;">
+                                        <span class="badge {% if f.dias_restantes <= 30 %}badge-danger{% else %}badge-warning{% endif %}">
+                                            {{ f.dias_restantes }}d
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-secondary text-center" style="padding: 20px;">Nenhuma férias vencendo nos próximos 90 dias.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Demografia -->
+            <div class="tab-content" id="tab-demografia">
+                <div class="dashboard-grid">
+                    <!-- Por Sexo -->
+                    <div class="chart-container">
+                        <h3 class="chart-title">Distribuição por Sexo</h3>
+                        <div class="bar-chart">
+                            {% for item in por_sexo %}
+                            <div class="bar-item">
+                                <span class="bar-label">{{ item.sexo|default:"Não informado" }}</span>
+                                <div class="bar-container">
+                                    <div class="bar-fill" style="width: {% widthratio item.total total_ativos 100 %}%; background-color: {% if item.sexo == 'MASCULINO' %}#3498db{% elif item.sexo == 'FEMININO' %}#e91e63{% else %}#9e9e9e{% endif %};"></div>
+                                </div>
+                                <span class="bar-value">{{ item.total }} ({% widthratio item.total total_ativos 100 %}%)</span>
+                            </div>
+                            {% empty %}
+                            <p class="text-secondary text-center">Sem dados</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Por Estado Civil -->
+                    <div class="chart-container">
+                        <h3 class="chart-title">Distribuição por Estado Civil</h3>
+                        <div class="bar-chart">
+                            {% for item in por_estado_civil %}
+                            <div class="bar-item">
+                                <span class="bar-label">{{ item.estado_civil|default:"Não informado" }}</span>
+                                <div class="bar-container">
+                                    <div class="bar-fill" style="width: {% widthratio item.total total_ativos 100 %}%; background-color: var(--cor-sucesso);"></div>
+                                </div>
+                                <span class="bar-value">{{ item.total }}</span>
+                            </div>
+                            {% empty %}
+                            <p class="text-secondary text-center">Sem dados</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Por Escolaridade -->
+                    <div class="chart-container">
+                        <h3 class="chart-title">Distribuição por Escolaridade</h3>
+                        <div class="bar-chart">
+                            {% for item in por_escolaridade %}
+                            <div class="bar-item">
+                                <span class="bar-label">{{ item.grau_instrucao|default:"Não informado" }}</span>
+                                <div class="bar-container">
+                                    <div class="bar-fill" style="width: {% widthratio item.total total_ativos 100 %}%; background-color: var(--cor-primaria);"></div>
+                                </div>
+                                <span class="bar-value">{{ item.total }}</span>
+                            </div>
+                            {% empty %}
+                            <p class="text-secondary text-center">Sem dados</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+
+                    <!-- Por Faixa Etária -->
+                    <div class="chart-container">
+                        <h3 class="chart-title">Distribuição por Faixa Etária</h3>
+                        <div class="bar-chart">
+                            {% for item in por_faixa_etaria %}
+                            <div class="bar-item">
+                                <span class="bar-label">{{ item.faixa }}</span>
+                                <div class="bar-container">
+                                    <div class="bar-fill" style="width: {% widthratio item.total total_ativos 100 %}%; background-color: var(--cor-alerta);"></div>
+                                </div>
+                                <span class="bar-value">{{ item.total }}</span>
+                            </div>
+                            {% empty %}
+                            <p class="text-secondary text-center">Sem dados</p>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

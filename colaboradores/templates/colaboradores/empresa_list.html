@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Empresas{% endblock %}
+
+{% block content %}
+<div class="table-container">
+    <div class="table-header">
+        <div class="table-title">
+            <span class="material-symbols-outlined">business</span>
+            <span>Empresas</span>
+        </div>
+
+        <div class="table-controls">
+            <div class="table-search">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Pesquisar por nome ou CNPJ">
+            </div>
+
+            <a href="{% url 'colaboradores:empresa_create' %}" class="btn btn-success">
+                <span class="material-symbols-outlined">add_business</span>
+                Nova Empresa
+            </a>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Logo</th>
+                <th>Razão Social</th>
+                <th>CNPJ</th>
+                <th>Cidade/UF</th>
+                <th>Telefone</th>
+                <th>Status</th>
+                <th style="width: 120px;">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for empresa in empresas %}
+            <tr>
+                <td>
+                    <div class="avatar" style="width: 40px; height: 40px;">
+                        {% if empresa.logo %}
+                        <img src="{{ empresa.logo.url }}" alt="{{ empresa.razao_social }}">
+                        {% else %}
+                        <span class="material-symbols-outlined">business</span>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>{{ empresa.razao_social }}</td>
+                <td>{{ empresa.cnpj }}</td>
+                <td>{{ empresa.cidade|default:"-" }}/{{ empresa.uf|default:"-" }}</td>
+                <td>{{ empresa.telefone|default:"-" }}</td>
+                <td>
+                    {% if empresa.ativa %}
+                    <span class="badge badge-success">Ativa</span>
+                    {% else %}
+                    <span class="badge badge-danger">Inativa</span>
+                    {% endif %}
+                </td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'colaboradores:empresa_edit' empresa.pk %}" class="btn-icon" title="Editar">
+                            <span class="material-symbols-outlined">edit</span>
+                        </a>
+                        <a href="{% url 'colaboradores:empresa_delete' empresa.pk %}" class="btn-icon" title="Excluir">
+                            <span class="material-symbols-outlined">delete</span>
+                        </a>
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center" style="padding: 40px;">
+                    <span class="material-symbols-outlined" style="font-size: 48px; color: var(--cor-cinza-claro);">business</span>
+                    <p class="mt-2 text-secondary">Nenhuma empresa cadastrada.</p>
+                    <a href="{% url 'colaboradores:empresa_create' %}" class="btn btn-success mt-2">
+                        <span class="material-symbols-outlined">add_business</span>
+                        Cadastrar Primeira Empresa
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

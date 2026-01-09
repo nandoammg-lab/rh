@@ -1,0 +1,159 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Gestão de RH{% endblock %} - RENOVO</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Menu -->
+        <aside class="sidebar">
+            <!-- Logo Section -->
+            <div class="sidebar-logo">
+                <span class="material-symbols-outlined logo-icon">groups</span>
+                <span class="logo-text">Gestão de RH</span>
+            </div>
+
+            <!-- User Section -->
+            <div class="sidebar-user">
+                <span class="material-symbols-outlined user-icon">account_circle</span>
+                <div class="user-info">
+                    <span class="user-name">{% if user.is_authenticated %}{{ user.first_name|default:user.username|truncatechars:16 }}{% else %}Visitante{% endif %}</span>
+                    <span class="user-role">
+                        {% if user.is_superuser %}Administrador{% elif user.is_staff %}Operador{% else %}Visualizador{% endif %}
+                    </span>
+                </div>
+                <div class="user-actions">
+                    {% if user.is_authenticated %}
+                    <a href="{% url 'admin:index' %}" class="btn-user-action">Conta</a>
+                    <a href="{% url 'logout' %}" class="btn-user-action">Sair</a>
+                    {% else %}
+                    <a href="{% url 'login' %}" class="btn-user-action">Entrar</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Navigation Menu -->
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item {% if request.resolver_match.url_name == 'colaborador_list' %}active{% endif %}">
+                        <a href="{% url 'colaboradores:colaborador_list' %}">
+                            <span class="material-symbols-outlined">people</span>
+                            <span>Colaboradores</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if request.resolver_match.url_name == 'colaborador_create' %}active{% endif %}">
+                        <a href="{% url 'colaboradores:colaborador_create' %}">
+                            <span class="material-symbols-outlined">person_add</span>
+                            <span>Novo Colaborador</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-divider"></li>
+
+                    <li class="nav-item {% if request.resolver_match.url_name == 'contratos_list' %}active{% endif %}">
+                        <a href="{% url 'colaboradores:contratos_list' %}">
+                            <span class="material-symbols-outlined">schedule</span>
+                            <span>Contratos Exp.</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if request.resolver_match.url_name == 'ferias_list' %}active{% endif %}">
+                        <a href="{% url 'colaboradores:ferias_list' %}">
+                            <span class="material-symbols-outlined">beach_access</span>
+                            <span>Férias</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if request.resolver_match.url_name == 'aniversariantes' %}active{% endif %}">
+                        <a href="{% url 'colaboradores:aniversariantes' %}">
+                            <span class="material-symbols-outlined">cake</span>
+                            <span>Aniversariantes</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-divider"></li>
+
+                    <li class="nav-item {% if request.resolver_match.url_name == 'blocklist' %}active{% endif %}">
+                        <a href="{% url 'colaboradores:blocklist' %}">
+                            <span class="material-symbols-outlined">block</span>
+                            <span>Block-List</span>
+                        </a>
+                    </li>
+                    <li class="nav-item {% if request.resolver_match.url_name == 'empresa_list' %}active{% endif %}">
+                        <a href="{% url 'colaboradores:empresa_list' %}">
+                            <span class="material-symbols-outlined">business</span>
+                            <span>Empresas</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-divider"></li>
+
+                    <li class="nav-section-header">ANÁLISES</li>
+                    <li class="nav-item {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+                        <a href="{% url 'colaboradores:dashboard' %}">
+                            <span class="material-symbols-outlined">analytics</span>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-divider"></li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'colaboradores:exportar' %}">
+                            <span class="material-symbols-outlined">download</span>
+                            <span>Exportar Excel</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-divider"></li>
+
+                    <li class="nav-item">
+                        <a href="{% url 'colaboradores:logs' %}">
+                            <span class="material-symbols-outlined">history</span>
+                            <span>Log</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'colaboradores:sobre' %}">
+                            <span class="material-symbols-outlined">info</span>
+                            <span>Sobre</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <!-- Footer -->
+            <div class="sidebar-footer">
+                <span class="version">v1.05</span>
+                <span class="copyright">&copy; 2026 RENOVO</span>
+            </div>
+        </aside>
+
+        <!-- Divider -->
+        <div class="sidebar-divider"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            {% if messages %}
+            <div class="messages">
+                {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    {{ message }}
+                    <button class="alert-close" onclick="this.parentElement.remove()">&times;</button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

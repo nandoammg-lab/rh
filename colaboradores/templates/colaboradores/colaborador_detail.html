@@ -1,0 +1,430 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ colaborador.nome_completo }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <span class="material-symbols-outlined">person</span>
+        <span>Detalhes do Colaborador</span>
+        <div style="margin-left: auto;">
+            <a href="{% url 'colaboradores:colaborador_edit' colaborador.pk %}" class="btn btn-primary" style="margin-right: 10px;">
+                <span class="material-symbols-outlined">edit</span>
+                Editar
+            </a>
+            <a href="{% url 'colaboradores:colaborador_pdf' colaborador.pk %}" class="btn btn-warning">
+                <span class="material-symbols-outlined">picture_as_pdf</span>
+                Gerar PDF
+            </a>
+        </div>
+    </div>
+
+    <div class="card-body">
+        <!-- Header with Photo and Basic Info -->
+        <div class="flex gap-3 mb-4" style="align-items: flex-start;">
+            <div class="avatar" style="width: 120px; height: 120px; font-size: 48px;">
+                {% if colaborador.foto %}
+                <img src="{{ colaborador.foto.url }}" alt="{{ colaborador.nome_completo }}">
+                {% else %}
+                <span class="material-symbols-outlined" style="font-size: 48px;">person</span>
+                {% endif %}
+            </div>
+            <div>
+                <h2 style="font-size: 24px; color: var(--cor-primaria); margin-bottom: 5px;">
+                    {{ colaborador.nome_completo }}
+                </h2>
+                <p class="text-secondary">{{ colaborador.funcao|default:"Função não informada" }}</p>
+                <div class="flex gap-2 mt-2">
+                    <span class="badge {% if colaborador.status == 'ATIVO' %}badge-success{% elif colaborador.status == 'DESLIGADO' %}badge-danger{% else %}badge-warning{% endif %}">
+                        {{ colaborador.get_status_display }}
+                    </span>
+                    {% if colaborador.tipo_contrato %}
+                    <span class="badge {% if colaborador.tipo_contrato == 'CLT' %}badge-success{% else %}badge-warning{% endif %}">
+                        {{ colaborador.tipo_contrato }}
+                    </span>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tabs-header">
+                <button type="button" class="tab-btn active" data-tab="tab-pessoais">Dados Pessoais</button>
+                <button type="button" class="tab-btn" data-tab="tab-documentos">Documentos</button>
+                <button type="button" class="tab-btn" data-tab="tab-contrato">Contrato</button>
+                <button type="button" class="tab-btn" data-tab="tab-ferias">Férias</button>
+                <button type="button" class="tab-btn" data-tab="tab-dependentes">Dependentes</button>
+                <button type="button" class="tab-btn" data-tab="tab-localizacoes">Localizações</button>
+            </div>
+
+            <!-- Tab: Dados Pessoais -->
+            <div class="tab-content active" id="tab-pessoais">
+                <div class="section">
+                    <div class="section-header">Informações Básicas</div>
+                    <div class="section-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="text-secondary">CPF</label>
+                                <span class="font-medium">{{ colaborador.cpf|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">Data de Nascimento</label>
+                                <span class="font-medium">{{ colaborador.data_nascimento|date:"d/m/Y"|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">Sexo</label>
+                                <span class="font-medium">{{ colaborador.get_sexo_display|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">Estado Civil</label>
+                                <span class="font-medium">{{ colaborador.get_estado_civil_display|default:"-" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">Contato</div>
+                    <div class="section-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="text-secondary">Telefone</label>
+                                <span class="font-medium">{{ colaborador.telefone|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">Celular</label>
+                                <span class="font-medium">{{ colaborador.celular|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">E-mail</label>
+                                <span class="font-medium">{{ colaborador.email|default:"-" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">Endereço</div>
+                    <div class="section-content">
+                        <div class="form-row">
+                            <div class="form-group" style="flex: 1;">
+                                <label class="text-secondary">Endereço Completo</label>
+                                <span class="font-medium">
+                                    {% if colaborador.endereco %}
+                                    {{ colaborador.endereco }}, {{ colaborador.numero|default:"S/N" }}
+                                    {% if colaborador.complemento %} - {{ colaborador.complemento }}{% endif %}
+                                    <br>{{ colaborador.bairro|default:"" }} - {{ colaborador.cidade|default:"" }}/{{ colaborador.uf_endereco|default:"" }}
+                                    <br>CEP: {{ colaborador.cep|default:"-" }}
+                                    {% else %}
+                                    -
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Documentos -->
+            <div class="tab-content" id="tab-documentos">
+                <div class="section">
+                    <div class="section-header">Documentos Principais</div>
+                    <div class="section-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="text-secondary">RG</label>
+                                <span class="font-medium">{{ colaborador.rg|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">Órgão/UF</label>
+                                <span class="font-medium">{{ colaborador.orgao_emissor_rg|default:"" }}/{{ colaborador.uf_rg|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">PIS</label>
+                                <span class="font-medium">{{ colaborador.pis|default:"-" }}</span>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="text-secondary">Carteira Profissional</label>
+                                <span class="font-medium">{{ colaborador.carteira_profissional|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">Série/UF</label>
+                                <span class="font-medium">{{ colaborador.serie_carteira|default:"" }}/{{ colaborador.uf_carteira|default:"-" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">CNH</div>
+                    <div class="section-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="text-secondary">Número</label>
+                                <span class="font-medium">{{ colaborador.habilitacao|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">Categoria</label>
+                                <span class="font-medium">{{ colaborador.tipo_cnh|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">Validade</label>
+                                <span class="font-medium">{{ colaborador.validade_cnh|date:"d/m/Y"|default:"-" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">Arquivos Anexados</div>
+                    <div class="section-content">
+                        {% if colaborador.documentos.exists %}
+                        <table style="width: 100%;">
+                            <thead style="background: var(--cor-fundo);">
+                                <tr>
+                                    <th style="padding: 8px;">Tipo</th>
+                                    <th style="padding: 8px;">Arquivo</th>
+                                    <th style="padding: 8px;">Data</th>
+                                    <th style="padding: 8px; width: 80px;">Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for doc in colaborador.documentos.all %}
+                                <tr>
+                                    <td style="padding: 8px;">{{ doc.tipo_documento }}</td>
+                                    <td style="padding: 8px;">{{ doc.nome_arquivo_original|default:doc.arquivo.name }}</td>
+                                    <td style="padding: 8px;">{{ doc.created_at|date:"d/m/Y" }}</td>
+                                    <td style="padding: 8px;">
+                                        <a href="{{ doc.arquivo.url }}" class="btn-icon" target="_blank" title="Baixar">
+                                            <span class="material-symbols-outlined">download</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-secondary text-center" style="padding: 20px;">Nenhum documento anexado.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Contrato -->
+            <div class="tab-content" id="tab-contrato">
+                <div class="section">
+                    <div class="section-header">Dados do Contrato</div>
+                    <div class="section-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="text-secondary">Empresa</label>
+                                <span class="font-medium">{{ colaborador.empresa.razao_social|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">Data de Admissão</label>
+                                <span class="font-medium">{{ colaborador.data_admissao|date:"d/m/Y"|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">Tipo de Contrato</label>
+                                <span class="font-medium">{{ colaborador.tipo_contrato|default:"-" }}</span>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="text-secondary">Função</label>
+                                <span class="font-medium">{{ colaborador.funcao|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">Departamento</label>
+                                <span class="font-medium">{{ colaborador.departamento|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">Salário</label>
+                                <span class="font-medium">{% if colaborador.salario %}R$ {{ colaborador.salario|floatformat:2 }}{% else %}-{% endif %}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">Horário de Trabalho</div>
+                    <div class="section-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="text-secondary">Dias de Trabalho</label>
+                                <span class="font-medium">{{ colaborador.dias_trabalho|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">Horário</label>
+                                <span class="font-medium">{{ colaborador.horario_trabalho|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">Intervalo</label>
+                                <span class="font-medium">{{ colaborador.intervalo|default:"-" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-header">Dados Bancários</div>
+                    <div class="section-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="text-secondary">Banco</label>
+                                <span class="font-medium">{{ colaborador.banco|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">Agência</label>
+                                <span class="font-medium">{{ colaborador.agencia|default:"-" }}</span>
+                            </div>
+                            <div class="form-group">
+                                <label class="text-secondary">Conta</label>
+                                <span class="font-medium">{{ colaborador.conta|default:"-" }} ({{ colaborador.tipo_conta|default:"-" }})</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Férias -->
+            <div class="tab-content" id="tab-ferias">
+                <div class="section">
+                    <div class="section-header">
+                        Períodos de Férias
+                        <a href="{% url 'colaboradores:ferias_create' colaborador.pk %}" class="btn btn-success" style="margin-left: auto; font-size: 12px;">
+                            <span class="material-symbols-outlined">add</span>
+                            Novo Período
+                        </a>
+                    </div>
+                    <div class="section-content">
+                        {% if colaborador.ferias.exists %}
+                        <table style="width: 100%;">
+                            <thead style="background: var(--cor-fundo);">
+                                <tr>
+                                    <th style="padding: 8px;">Período Aquisitivo</th>
+                                    <th style="padding: 8px;">Limite Concessivo</th>
+                                    <th style="padding: 8px;">Dias</th>
+                                    <th style="padding: 8px;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for ferias in colaborador.ferias.all %}
+                                <tr>
+                                    <td style="padding: 8px;">
+                                        {{ ferias.periodo_aquisitivo_inicio|date:"d/m/Y" }} a {{ ferias.periodo_aquisitivo_fim|date:"d/m/Y" }}
+                                    </td>
+                                    <td style="padding: 8px;">{{ ferias.periodo_concessivo_limite|date:"d/m/Y" }}</td>
+                                    <td style="padding: 8px;">{{ ferias.dias_gozados }}/{{ ferias.dias_direito }}</td>
+                                    <td style="padding: 8px;">
+                                        <span class="badge {% if ferias.status == 'CONCLUIDA' %}badge-success{% elif ferias.status == 'VENCIDA' %}badge-danger{% elif ferias.status == 'EM_GOZO' %}badge-info{% else %}badge-warning{% endif %}">
+                                            {{ ferias.get_status_display }}
+                                        </span>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-secondary text-center" style="padding: 20px;">Nenhum período de férias cadastrado.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Dependentes -->
+            <div class="tab-content" id="tab-dependentes">
+                <div class="section">
+                    <div class="section-header">
+                        Dependentes
+                        <a href="{% url 'colaboradores:dependente_create' colaborador.pk %}" class="btn btn-success" style="margin-left: auto; font-size: 12px;">
+                            <span class="material-symbols-outlined">add</span>
+                            Novo Dependente
+                        </a>
+                    </div>
+                    <div class="section-content">
+                        {% if colaborador.dependentes.exists %}
+                        <table style="width: 100%;">
+                            <thead style="background: var(--cor-fundo);">
+                                <tr>
+                                    <th style="padding: 8px;">Nome</th>
+                                    <th style="padding: 8px;">Parentesco</th>
+                                    <th style="padding: 8px;">Data Nascimento</th>
+                                    <th style="padding: 8px;">CPF</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for dep in colaborador.dependentes.all %}
+                                <tr>
+                                    <td style="padding: 8px;">{{ dep.nome }}</td>
+                                    <td style="padding: 8px;">{{ dep.parentesco|default:"-" }}</td>
+                                    <td style="padding: 8px;">{{ dep.data_nascimento|date:"d/m/Y"|default:"-" }}</td>
+                                    <td style="padding: 8px;">{{ dep.cpf|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-secondary text-center" style="padding: 20px;">Nenhum dependente cadastrado.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab: Localizações -->
+            <div class="tab-content" id="tab-localizacoes">
+                <div class="section">
+                    <div class="section-header">
+                        Histórico de Localizações
+                        <a href="{% url 'colaboradores:localizacao_create' colaborador.pk %}" class="btn btn-success" style="margin-left: auto; font-size: 12px;">
+                            <span class="material-symbols-outlined">add</span>
+                            Nova Localização
+                        </a>
+                    </div>
+                    <div class="section-content">
+                        {% if colaborador.localizacoes.exists %}
+                        <table style="width: 100%;">
+                            <thead style="background: var(--cor-fundo);">
+                                <tr>
+                                    <th style="padding: 8px;">Local</th>
+                                    <th style="padding: 8px;">Cidade/UF</th>
+                                    <th style="padding: 8px;">Período</th>
+                                    <th style="padding: 8px;">Observações</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for loc in colaborador.localizacoes.all %}
+                                <tr>
+                                    <td style="padding: 8px;">{{ loc.local_nome }}</td>
+                                    <td style="padding: 8px;">{{ loc.cidade|default:"" }}/{{ loc.uf|default:"-" }}</td>
+                                    <td style="padding: 8px;">
+                                        {{ loc.data_inicio|date:"d/m/Y" }}
+                                        {% if loc.data_fim %} a {{ loc.data_fim|date:"d/m/Y" }}{% else %} - Atual{% endif %}
+                                    </td>
+                                    <td style="padding: 8px;">{{ loc.observacoes|default:"-" }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <p class="text-secondary text-center" style="padding: 20px;">Nenhuma localização cadastrada.</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Back Button -->
+        <div class="mt-4">
+            <a href="{% url 'colaboradores:colaborador_list' %}" class="btn btn-outline">
+                <span class="material-symbols-outlined">arrow_back</span>
+                Voltar para Lista
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Logs do Sistema{% endblock %}
+
+{% block content %}
+<div class="table-container">
+    <div class="table-header">
+        <div class="table-title">
+            <span class="material-symbols-outlined">history</span>
+            <span>Logs do Sistema</span>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Data/Hora</th>
+                <th>Tipo</th>
+                <th>Categoria</th>
+                <th>Descrição</th>
+                <th>Entidade</th>
+                <th>Usuário</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for log in logs %}
+            <tr>
+                <td>{{ log.data_hora|date:"d/m/Y H:i:s" }}</td>
+                <td>
+                    <span class="badge {% if log.tipo_acao == 'CRIAR' %}badge-success{% elif log.tipo_acao == 'EDITAR' %}badge-warning{% elif log.tipo_acao == 'EXCLUIR' %}badge-danger{% else %}badge-info{% endif %}">
+                        {{ log.tipo_acao }}
+                    </span>
+                </td>
+                <td>{{ log.categoria }}</td>
+                <td>{{ log.descricao|truncatewords:15 }}</td>
+                <td>{{ log.entidade_nome|default:"-" }}</td>
+                <td>{{ log.usuario|default:"Sistema" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" class="text-center" style="padding: 40px;">
+                    <span class="material-symbols-outlined" style="font-size: 48px; color: var(--cor-cinza-claro);">history</span>
+                    <p class="mt-2 text-secondary">Nenhum log registrado.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

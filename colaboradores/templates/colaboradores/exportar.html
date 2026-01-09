@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Exportar{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <span class="material-symbols-outlined">download</span>
+        <span>Exportar Dados</span>
+    </div>
+
+    <div class="card-body">
+        <div class="dashboard-grid">
+            <div class="chart-container">
+                <h3 class="chart-title">
+                    <span class="material-symbols-outlined" style="color: var(--cor-sucesso);">table_chart</span>
+                    Colaboradores
+                </h3>
+                <p class="text-secondary mb-3">Exportar lista de colaboradores com dados pessoais e contratuais.</p>
+                <div class="btn-group">
+                    <a href="#" class="btn btn-success">
+                        <span class="material-symbols-outlined">download</span>
+                        Excel (.xlsx)
+                    </a>
+                    <a href="#" class="btn btn-outline">
+                        <span class="material-symbols-outlined">download</span>
+                        CSV
+                    </a>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3 class="chart-title">
+                    <span class="material-symbols-outlined" style="color: var(--cor-alerta);">schedule</span>
+                    Contratos de Experiência
+                </h3>
+                <p class="text-secondary mb-3">Exportar lista de contratos de experiência vigentes.</p>
+                <div class="btn-group">
+                    <a href="#" class="btn btn-success">
+                        <span class="material-symbols-outlined">download</span>
+                        Excel (.xlsx)
+                    </a>
+                    <a href="#" class="btn btn-outline">
+                        <span class="material-symbols-outlined">download</span>
+                        CSV
+                    </a>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3 class="chart-title">
+                    <span class="material-symbols-outlined" style="color: var(--cor-primaria);">beach_access</span>
+                    Férias
+                </h3>
+                <p class="text-secondary mb-3">Exportar controle de férias de todos os colaboradores.</p>
+                <div class="btn-group">
+                    <a href="#" class="btn btn-success">
+                        <span class="material-symbols-outlined">download</span>
+                        Excel (.xlsx)
+                    </a>
+                    <a href="#" class="btn btn-outline">
+                        <span class="material-symbols-outlined">download</span>
+                        CSV
+                    </a>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <h3 class="chart-title">
+                    <span class="material-symbols-outlined" style="color: var(--cor-erro);">location_on</span>
+                    Localizações
+                </h3>
+                <p class="text-secondary mb-3">Exportar relatório de localizações atuais dos colaboradores.</p>
+                <div class="btn-group">
+                    <a href="#" class="btn btn-success">
+                        <span class="material-symbols-outlined">download</span>
+                        Excel (.xlsx)
+                    </a>
+                    <a href="#" class="btn btn-outline">
+                        <span class="material-symbols-outlined">download</span>
+                        CSV
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="alert alert-info mt-4">
+            <span class="material-symbols-outlined">info</span>
+            <strong>Dica:</strong> A exportação em Excel mantém a formatação e permite filtros avançados. O formato CSV é ideal para importação em outros sistemas.
+        </div>
+    </div>
+</div>
+{% endblock %}

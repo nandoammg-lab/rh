@@ -1,5 +1,5 @@
 """
-Models Django - Modulo RH (Sistema de Gestao de Recursos Humanos)
+Models Django - Módulo RH (Sistema de Gestão de Recursos Humanos)
 Migrado de SQLAlchemy para Django ORM
 """
 
@@ -38,7 +38,7 @@ class Colaborador(models.Model):
     class Status(models.TextChoices):
         ATIVO = "ATIVO", "Ativo"
         INATIVO = "INATIVO", "Inativo"
-        FERIAS = "FERIAS", "Ferias"
+        FERIAS = "FERIAS", "Férias"
         AFASTADO = "AFASTADO", "Afastado"
         DESLIGADO = "DESLIGADO", "Desligado"
 
@@ -47,22 +47,149 @@ class Colaborador(models.Model):
         FEMININO = "FEMININO", "Feminino"
 
     class EstadoCivil(models.TextChoices):
-        SOLTEIRO = "SOLTEIRO", "Solteiro"
-        CASADO = "CASADO", "Casado"
-        DIVORCIADO = "DIVORCIADO", "Divorciado"
-        VIUVO = "VIUVO", "Viuvo"
-        UNIAO_ESTAVEL = "UNIAO_ESTAVEL", "Uniao Estavel"
+        SOLTEIRO = "SOLTEIRO", "Solteiro(a)"
+        CASADO = "CASADO", "Casado(a)"
+        DIVORCIADO = "DIVORCIADO", "Divorciado(a)"
+        VIUVO = "VIUVO", "Viúvo(a)"
+        UNIAO_ESTAVEL = "UNIAO_ESTAVEL", "União Estável"
 
+    # Foto
     foto = models.ImageField(upload_to="colaboradores/fotos/", blank=True, null=True)
+
+    # Empresa Contratante
     empresa = models.ForeignKey(Empresa, on_delete=models.SET_NULL, null=True, blank=True, related_name="colaboradores")
+
+    # Dados Pessoais
     nome_completo = models.CharField(max_length=255)
+    endereco = models.CharField(max_length=255, blank=True, null=True)
+    numero = models.CharField(max_length=20, blank=True, null=True)
+    complemento = models.CharField(max_length=100, blank=True, null=True)
+    bairro = models.CharField(max_length=100, blank=True, null=True)
+    cep = models.CharField(max_length=10, blank=True, null=True)
+    cidade = models.CharField(max_length=100, blank=True, null=True)
+    uf_endereco = models.CharField(max_length=2, blank=True, null=True)
+    telefone = models.CharField(max_length=20, blank=True, null=True)
+    celular = models.CharField(max_length=20, blank=True, null=True)
+    email = models.EmailField(max_length=255, blank=True, null=True)
+    data_nascimento = models.DateField(blank=True, null=True)
+    naturalidade = models.CharField(max_length=100, blank=True, null=True)
+    uf_naturalidade = models.CharField(max_length=2, blank=True, null=True)
+    sexo = models.CharField(max_length=20, choices=Sexo.choices, blank=True, null=True)
+    grau_instrucao = models.CharField(max_length=100, blank=True, null=True)
+    curso_formacao = models.CharField(max_length=255, blank=True, null=True)
+    estado_civil = models.CharField(max_length=50, choices=EstadoCivil.choices, blank=True, null=True)
+    data_casamento = models.DateField(blank=True, null=True)
+    nome_conjuge = models.CharField(max_length=255, blank=True, null=True)
+    deficiencia = models.CharField(max_length=255, blank=True, null=True)
+    nome_mae = models.CharField(max_length=255, blank=True, null=True)
+    cpf_mae = models.CharField(max_length=14, blank=True, null=True)
+    nome_pai = models.CharField(max_length=255, blank=True, null=True)
+    cpf_pai = models.CharField(max_length=14, blank=True, null=True)
+    data_conclusao = models.DateField(blank=True, null=True)
+
+    # Documentos
+    carteira_profissional = models.CharField(max_length=50, blank=True, null=True)
+    serie_carteira = models.CharField(max_length=20, blank=True, null=True)
+    uf_carteira = models.CharField(max_length=2, blank=True, null=True)
+    data_emissao_carteira = models.DateField(blank=True, null=True)
+    rg = models.CharField(max_length=20, blank=True, null=True)
+    data_emissao_rg = models.DateField(blank=True, null=True)
+    orgao_emissor_rg = models.CharField(max_length=50, blank=True, null=True)
+    uf_rg = models.CharField(max_length=2, blank=True, null=True)
     cpf = models.CharField(max_length=14, unique=True)
+    titulo_eleitor = models.CharField(max_length=20, blank=True, null=True)
+    zona_eleitor = models.CharField(max_length=10, blank=True, null=True)
+    secao_eleitor = models.CharField(max_length=10, blank=True, null=True)
+    habilitacao = models.CharField(max_length=20, blank=True, null=True)
+    data_expedicao_cnh = models.DateField(blank=True, null=True)
+    tipo_cnh = models.CharField(max_length=10, blank=True, null=True)
+    validade_cnh = models.DateField(blank=True, null=True)
+    pis = models.CharField(max_length=20, blank=True, null=True)
+    data_cadastramento_pis = models.DateField(blank=True, null=True)
+    reservista = models.CharField(max_length=50, blank=True, null=True)
+
+    # Conselho Regional
+    conselho_regional = models.CharField(max_length=100, blank=True, null=True)
+    sigla_conselho = models.CharField(max_length=20, blank=True, null=True)
+    numero_conselho = models.CharField(max_length=50, blank=True, null=True)
+    regiao_conselho = models.CharField(max_length=50, blank=True, null=True)
+
+    # Exame Médico
+    data_exame_medico = models.DateField(blank=True, null=True)
+    tipo_exames = models.CharField(max_length=255, blank=True, null=True)
+    nome_medico = models.CharField(max_length=255, blank=True, null=True)
+    crm = models.CharField(max_length=20, blank=True, null=True)
+    uf_crm = models.CharField(max_length=2, blank=True, null=True)
+
+    # Último Emprego
+    cnpj_ultimo_emprego = models.CharField(max_length=20, blank=True, null=True)
+    empresa_ultimo_emprego = models.CharField(max_length=255, blank=True, null=True)
+    data_admissao_ultimo = models.DateField(blank=True, null=True)
+    data_saida_ultimo = models.DateField(blank=True, null=True)
+    matricula_ultimo = models.CharField(max_length=50, blank=True, null=True)
+    primeiro_registro = models.CharField(max_length=50, blank=True, null=True)
+    data_ultima_contribuicao_sindical = models.DateField(blank=True, null=True)
+
+    # Dados da Empresa Atual
+    data_admissao = models.DateField(blank=True, null=True)
+    funcao = models.CharField(max_length=100, blank=True, null=True)
+    departamento = models.CharField(max_length=100, blank=True, null=True)
+    salario = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    forma_pagamento = models.CharField(max_length=50, blank=True, null=True)
+    prazo_experiencia = models.IntegerField(blank=True, null=True)
+    prorrogacao = models.IntegerField(blank=True, null=True)
+    dias_trabalho = models.CharField(max_length=100, blank=True, null=True)
+    horario_trabalho = models.CharField(max_length=50, blank=True, null=True)
+    intervalo = models.CharField(max_length=50, blank=True, null=True)
+    dias_folga = models.CharField(max_length=100, blank=True, null=True)
+    observacoes_contrato = models.TextField(blank=True, null=True)
+    tipo_contrato = models.CharField(max_length=50, blank=True, null=True)
+
+    # Beneficios
+    vale_transporte = models.BooleanField(default=False)
+    vt_valor_diario = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    vt_percentual_desconto = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    vale_refeicao = models.BooleanField(default=False)
+    vr_valor_diario = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    vr_percentual_desconto = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    vale_alimentacao = models.BooleanField(default=False)
+    va_valor_diario = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    va_percentual_desconto = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    assistencia_medica = models.BooleanField(default=False)
+    am_valor_desconto = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    assistencia_odontologica = models.BooleanField(default=False)
+    ao_valor_desconto = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    seguro_vida = models.BooleanField(default=False)
+    sv_valor_desconto = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
+    adiantamento = models.BooleanField(default=False)
+    percentual_adiantamento = models.DecimalField(max_digits=5, decimal_places=2, blank=True, null=True)
+    data_pagamento_adiantamento = models.IntegerField(blank=True, null=True)
+
+    # Dados Bancarios
+    tipo_conta = models.CharField(max_length=50, blank=True, null=True)
+    banco = models.CharField(max_length=100, blank=True, null=True)
+    agencia = models.CharField(max_length=20, blank=True, null=True)
+    conta = models.CharField(max_length=30, blank=True, null=True)
+    observacoes_banco = models.TextField(blank=True, null=True)
+
+    # Observacoes
+    observacoes_gerais = models.TextField(blank=True, null=True)
+
+    # Status e Controle
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.ATIVO)
+    data_desligamento = models.DateField(blank=True, null=True)
+    motivo_desligamento = models.TextField(blank=True, null=True)
+    observacoes_desligamento = models.TextField(blank=True, null=True)
+    motivo_inativacao = models.CharField(max_length=255, blank=True, null=True)
+    submotivo_inativacao = models.CharField(max_length=255, blank=True, null=True)
+    data_inativacao = models.DateField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = "colaboradores"
+        verbose_name = "Colaborador"
+        verbose_name_plural = "Colaboradores"
         ordering = ["nome_completo"]
 
     def __str__(self):
@@ -79,6 +206,8 @@ class Dependente(models.Model):
 
     class Meta:
         db_table = "dependentes"
+        verbose_name = "Dependente"
+        verbose_name_plural = "Dependentes"
 
 
 class Localizacao(models.Model):
@@ -94,6 +223,8 @@ class Localizacao(models.Model):
 
     class Meta:
         db_table = "localizacoes"
+        verbose_name = "Localização"
+        verbose_name_plural = "Localizações"
 
 
 class Ferias(models.Model):
@@ -101,7 +232,7 @@ class Ferias(models.Model):
         PENDENTE = "PENDENTE", "Pendente"
         PROGRAMADA = "PROGRAMADA", "Programada"
         EM_GOZO = "EM_GOZO", "Em Gozo"
-        CONCLUIDA = "CONCLUIDA", "Concluida"
+        CONCLUIDA = "CONCLUIDA", "Concluída"
         VENCIDA = "VENCIDA", "Vencida"
 
     colaborador = models.ForeignKey(Colaborador, on_delete=models.CASCADE, related_name="ferias")
@@ -117,6 +248,8 @@ class Ferias(models.Model):
 
     class Meta:
         db_table = "ferias"
+        verbose_name = "Férias"
+        verbose_name_plural = "Férias"
 
 
 class PeriodoFerias(models.Model):
@@ -130,6 +263,8 @@ class PeriodoFerias(models.Model):
 
     class Meta:
         db_table = "periodos_ferias"
+        verbose_name = "Período de Férias"
+        verbose_name_plural = "Períodos de Férias"
 
 
 class ContratoExperiencia(models.Model):
@@ -152,6 +287,8 @@ class ContratoExperiencia(models.Model):
 
     class Meta:
         db_table = "contratos_experiencia"
+        verbose_name = "Contrato de Experiência"
+        verbose_name_plural = "Contratos de Experiência"
 
 
 class Blocklist(models.Model):
@@ -167,6 +304,8 @@ class Blocklist(models.Model):
 
     class Meta:
         db_table = "blocklist"
+        verbose_name = "Block-List"
+        verbose_name_plural = "Block-List"
 
 
 class Configuracao(models.Model):
@@ -176,6 +315,8 @@ class Configuracao(models.Model):
 
     class Meta:
         db_table = "configuracoes"
+        verbose_name = "Configuração"
+        verbose_name_plural = "Configurações"
 
 
 class HistoricoAlteracao(models.Model):
@@ -188,6 +329,8 @@ class HistoricoAlteracao(models.Model):
 
     class Meta:
         db_table = "historico_alteracoes"
+        verbose_name = "Histórico de Alteração"
+        verbose_name_plural = "Histórico de Alterações"
         ordering = ["-data_alteracao"]
 
 
@@ -202,6 +345,8 @@ class DocumentoColaborador(models.Model):
 
     class Meta:
         db_table = "documentos_colaborador"
+        verbose_name = "Documento do Colaborador"
+        verbose_name_plural = "Documentos do Colaborador"
 
 
 class LogSistema(models.Model):
@@ -218,6 +363,8 @@ class LogSistema(models.Model):
 
     class Meta:
         db_table = "logs_sistema"
+        verbose_name = "Log do Sistema"
+        verbose_name_plural = "Logs do Sistema"
         ordering = ["-data_hora"]
 
 
@@ -239,3 +386,5 @@ class PerfilUsuario(models.Model):
 
     class Meta:
         db_table = "perfis_usuario"
+        verbose_name = "Perfil de Usuário"
+        verbose_name_plural = "Perfis de Usuário"

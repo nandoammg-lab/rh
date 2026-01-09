@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Block-List{% endblock %}
+
+{% block content %}
+<div class="table-container">
+    <div class="table-header">
+        <div class="table-title">
+            <span class="material-symbols-outlined">block</span>
+            <span>Block-List (Histórico de Ex-Funcionários)</span>
+        </div>
+
+        <div class="table-controls">
+            <div class="table-search">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Pesquisar por nome ou CPF">
+            </div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>Empresa</th>
+                <th>Data Admissão</th>
+                <th>Data Desligamento</th>
+                <th>Motivo</th>
+                <th>Pode Recontratar</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in blocklist %}
+            <tr>
+                <td>{{ item.nome }}</td>
+                <td>{{ item.cpf }}</td>
+                <td>{{ item.empresa.razao_social|default:"-" }}</td>
+                <td>{{ item.data_admissao|date:"d/m/Y"|default:"-" }}</td>
+                <td>{{ item.data_desligamento|date:"d/m/Y"|default:"-" }}</td>
+                <td>{{ item.motivo_desligamento|truncatewords:10|default:"-" }}</td>
+                <td>
+                    {% if item.pode_recontratar %}
+                    <span class="badge badge-success">Sim</span>
+                    {% else %}
+                    <span class="badge badge-danger">Não</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="7" class="text-center" style="padding: 40px;">
+                    <span class="material-symbols-outlined" style="font-size: 48px; color: var(--cor-cinza-claro);">block</span>
+                    <p class="mt-2 text-secondary">Nenhum registro na block-list.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

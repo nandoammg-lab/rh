@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Aniversariantes{% endblock %}
+
+{% block content %}
+<div class="table-container">
+    <div class="table-header">
+        <div class="table-title">
+            <span class="material-symbols-outlined">cake</span>
+            <span>Aniversariantes</span>
+        </div>
+
+        <div class="table-controls">
+            <select class="form-control" onchange="window.location.href='?mes=' + this.value">
+                {% for num, nome in meses %}
+                <option value="{{ num }}" {% if mes_atual == num %}selected{% endif %}>{{ nome }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 50px;">Foto</th>
+                <th>Nome</th>
+                <th>Data de Nascimento</th>
+                <th>Empresa</th>
+                <th>Função</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for colab in aniversariantes %}
+            <tr>
+                <td>
+                    <div class="avatar">
+                        {% if colab.foto %}
+                        <img src="{{ colab.foto.url }}" alt="{{ colab.nome_completo }}">
+                        {% else %}
+                        <span class="material-symbols-outlined">person</span>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <a href="{% url 'colaboradores:colaborador_detail' colab.pk %}">
+                        {{ colab.nome_completo }}
+                    </a>
+                </td>
+                <td>
+                    <span class="material-symbols-outlined" style="vertical-align: middle; color: var(--cor-alerta);">cake</span>
+                    {{ colab.data_nascimento|date:"d/m/Y" }}
+                </td>
+                <td>{{ colab.empresa.razao_social|default:"-" }}</td>
+                <td>{{ colab.funcao|default:"-" }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center" style="padding: 40px;">
+                    <span class="material-symbols-outlined" style="font-size: 48px; color: var(--cor-cinza-claro);">cake</span>
+                    <p class="mt-2 text-secondary">Nenhum aniversariante neste mês.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

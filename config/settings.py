@@ -78,6 +78,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
 
+# Banco de dados MySQL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',

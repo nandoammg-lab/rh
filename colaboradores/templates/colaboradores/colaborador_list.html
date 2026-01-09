@@ -1,0 +1,220 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Colaboradores{% endblock %}
+
+{% block content %}
+<!-- Alert Widgets -->
+{% if contratos_vencendo %}
+<div class="alert-widget alert-widget-danger">
+    <span class="material-symbols-outlined">warning</span>
+    <strong>Atenção!</strong> {{ contratos_vencendo }} contrato(s) de experiência vencendo nos próximos 5 dias.
+</div>
+{% endif %}
+
+{% if ferias_vencendo %}
+<div class="alert-widget alert-widget-warning">
+    <span class="material-symbols-outlined">info</span>
+    <strong>Aviso:</strong> {{ ferias_vencendo }} período(s) de férias vencendo nos próximos 90 dias.
+</div>
+{% endif %}
+
+<!-- Main Table Container -->
+<div class="table-container">
+    <!-- Header -->
+    <div class="table-header">
+        <div class="table-title">
+            <span class="material-symbols-outlined">people</span>
+            <span>Colaboradores</span>
+        </div>
+
+        <div class="table-controls">
+            <button id="btn-toggle-inativos" class="btn btn-outline" data-showing="false" onclick="toggleInativos()">
+                Ver Inativos
+            </button>
+
+            <select class="form-control" id="filter-empresa" onchange="filterByEmpresa(this.value)">
+                <option value="">Todas as Empresas</option>
+                {% for empresa in empresas %}
+                <option value="{{ empresa.id }}" {% if request.GET.empresa == empresa.id|stringformat:"s" %}selected{% endif %}>
+                    {{ empresa.razao_social }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <select class="form-control" id="filter-localizacao" onchange="filterByLocalizacao(this.value)">
+                <option value="">Todas as Localizações</option>
+                {% for loc in localizacoes %}
+                <option value="{{ loc }}" {% if request.GET.localizacao == loc %}selected{% endif %}>
+                    {{ loc }}
+                </option>
+                {% endfor %}
+            </select>
+
+            <div class="table-search">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Pesquisar por nome ou CPF" id="search-input">
+            </div>
+
+            <a href="{% url 'colaboradores:colaborador_create' %}" class="btn btn-success">
+                <span class="material-symbols-outlined">person_add</span>
+                Novo Colaborador
+            </a>
+
+            <a href="{% url 'colaboradores:relatorio_localizacoes' %}" class="btn btn-warning">
+                <span class="material-symbols-outlined">location_on</span>
+                Relatório Localizações
+            </a>
+        </div>
+    </div>
+
+    <!-- Table -->
+    <table>
+        <thead>
+            <tr>
+                <th style="width: 50px;">Foto</th>
+                <th>Nome</th>
+                <th>CPF</th>
+                <th>Localização</th>
+                <th style="width: 100px;">Contrato</th>
+                <th style="width: 80px;">Docs</th>
+                <th>Empresa</th>
+                <th style="width: 120px;">Ações</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for colaborador in colaboradores %}
+            <tr class="{% if colaborador.status != 'ATIVO' %}inactive{% endif %}"
+                data-empresa="{{ colaborador.empresa_id }}"
+                data-localizacao="{{ colaborador.localizacao_atual }}">
+                <td>
+                    <div class="avatar {% if colaborador.status != 'ATIVO' %}inactive{% endif %}">
+                        {% if colaborador.foto %}
+                        <img src="{{ colaborador.foto.url }}" alt="{{ colaborador.nome_completo }}">
+                        {% else %}
+                        <span class="material-symbols-outlined">person</span>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <a href="{% url 'colaboradores:colaborador_detail' colaborador.pk %}">
+                        {{ colaborador.nome_completo }}
+                    </a>
+                </td>
+                <td>{{ colaborador.cpf|default:"-" }}</td>
+                <td>{{ colaborador.localizacao_atual|default:"-" }}</td>
+                <td>
+                    {% if colaborador.contrato_tipo == 'CLT' %}
+                    <span class="badge badge-success">CLT</span>
+                    {% elif colaborador.contrato_tipo == 'Experiência' %}
+                    <span class="badge badge-warning">Experiência</span>
+                    {% else %}
+                    <span class="badge badge-secondary">-</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% with docs_count=colaborador.documentos.count docs_obrig=colaborador.docs_obrigatorios %}
+                    <span class="doc-badge {% if docs_count >= docs_obrig %}doc-badge-complete{% elif docs_count > 0 %}doc-badge-partial{% else %}doc-badge-missing{% endif %}">
+                        {{ docs_count }}/{{ docs_obrig }}
+                    </span>
+                    {% endwith %}
+                </td>
+                <td>{{ colaborador.empresa.razao_social|default:"-" }}</td>
+                <td>
+                    <div class="btn-group">
+                        <a href="{% url 'colaboradores:colaborador_detail' colaborador.pk %}" class="btn-icon" title="Ver detalhes">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </a>
+                        <a href="{% url 'colaboradores:colaborador_edit' colaborador.pk %}" class="btn-icon" title="Editar">
+                            <span class="material-symbols-outlined">edit</span>
+                        </a>
+                        <a href="{% url 'colaboradores:colaborador_pdf' colaborador.pk %}" class="btn-icon" title="Gerar PDF">
+                            <span class="material-symbols-outlined">picture_as_pdf</span>
+                        </a>
+                        {% if colaborador.status != 'ATIVO' %}
+                        <a href="{% url 'colaboradores:colaborador_reativar' colaborador.pk %}" class="btn-icon" title="Reativar">
+                            <span class="material-symbols-outlined">refresh</span>
+                        </a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center" style="padding: 40px;">
+                    <span class="material-symbols-outlined" style="font-size: 48px; color: var(--cor-cinza-claro);">person_off</span>
+                    <p class="mt-2 text-secondary">Nenhum colaborador encontrado.</p>
+                    <a href="{% url 'colaboradores:colaborador_create' %}" class="btn btn-success mt-2">
+                        <span class="material-symbols-outlined">person_add</span>
+                        Cadastrar Primeiro Colaborador
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    {% if is_paginated %}
+    <div class="pagination">
+        <span class="pagination-info">
+            Exibindo {{ page_obj.start_index }}-{{ page_obj.end_index }} de {{ page_obj.paginator.count }} colaboradores
+            (Página {{ page_obj.number }} de {{ page_obj.paginator.num_pages }})
+        </span>
+        <div class="pagination-controls">
+            {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="pagination-btn">
+                <span class="material-symbols-outlined">chevron_left</span>
+            </a>
+            {% endif %}
+
+            {% for num in page_obj.paginator.page_range %}
+                {% if page_obj.number == num %}
+                <span class="pagination-btn active">{{ num }}</span>
+                {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                <a href="?page={{ num }}" class="pagination-btn">{{ num }}</a>
+                {% endif %}
+            {% endfor %}
+
+            {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="pagination-btn">
+                <span class="material-symbols-outlined">chevron_right</span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterByEmpresa(empresaId) {
+    const url = new URL(window.location);
+    if (empresaId) {
+        url.searchParams.set('empresa', empresaId);
+    } else {
+        url.searchParams.delete('empresa');
+    }
+    window.location = url;
+}
+
+function filterByLocalizacao(localizacao) {
+    const url = new URL(window.location);
+    if (localizacao) {
+        url.searchParams.set('localizacao', localizacao);
+    } else {
+        url.searchParams.delete('localizacao');
+    }
+    window.location = url;
+}
+
+// Hide inactive rows by default
+document.addEventListener('DOMContentLoaded', function() {
+    document.querySelectorAll('tbody tr.inactive').forEach(row => {
+        row.style.display = 'none';
+    });
+});
+</script>
+{% endblock %}

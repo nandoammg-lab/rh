@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Férias{% endblock %}
+
+{% block content %}
+<div class="table-container">
+    <div class="table-header">
+        <div class="table-title">
+            <span class="material-symbols-outlined">beach_access</span>
+            <span>Controle de Férias</span>
+        </div>
+
+        <div class="table-controls">
+            <div class="table-search">
+                <span class="material-symbols-outlined">search</span>
+                <input type="text" placeholder="Pesquisar por nome">
+            </div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Colaborador</th>
+                <th>Empresa</th>
+                <th>Período Aquisitivo</th>
+                <th>Limite Concessivo</th>
+                <th>Dias Direito</th>
+                <th>Dias Gozados</th>
+                <th>Dias Restantes</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ferias in ferias_list %}
+            <tr>
+                <td>
+                    <a href="{% url 'colaboradores:colaborador_detail' ferias.colaborador.pk %}">
+                        {{ ferias.colaborador.nome_completo }}
+                    </a>
+                </td>
+                <td>{{ ferias.colaborador.empresa.razao_social|default:"-" }}</td>
+                <td>
+                    {{ ferias.periodo_aquisitivo_inicio|date:"d/m/Y" }} a
+                    {{ ferias.periodo_aquisitivo_fim|date:"d/m/Y" }}
+                </td>
+                <td>{{ ferias.periodo_concessivo_limite|date:"d/m/Y" }}</td>
+                <td>{{ ferias.dias_direito }}</td>
+                <td>{{ ferias.dias_gozados }}</td>
+                <td>
+                    <span class="badge {% if ferias.dias_restantes <= 30 %}badge-danger{% elif ferias.dias_restantes <= 60 %}badge-warning{% else %}badge-info{% endif %}">
+                        {{ ferias.dias_restantes }} dias
+                    </span>
+                </td>
+                <td>
+                    <span class="badge {% if ferias.status == 'PENDENTE' %}badge-secondary{% elif ferias.status == 'PROGRAMADA' %}badge-info{% elif ferias.status == 'EM_GOZO' %}badge-success{% elif ferias.status == 'VENCIDA' %}badge-danger{% else %}badge-secondary{% endif %}">
+                        {{ ferias.get_status_display }}
+                    </span>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="8" class="text-center" style="padding: 40px;">
+                    <span class="material-symbols-outlined" style="font-size: 48px; color: var(--cor-cinza-claro);">beach_access</span>
+                    <p class="mt-2 text-secondary">Nenhum período de férias pendente.</p>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

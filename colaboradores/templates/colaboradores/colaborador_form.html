@@ -1,0 +1,550 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if form.instance.pk %}Editar{% else %}Novo{% endif %} Colaborador{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <span class="material-symbols-outlined">{% if form.instance.pk %}edit{% else %}person_add{% endif %}</span>
+        <span>{% if form.instance.pk %}Editar Colaborador{% else %}Novo Colaborador{% endif %}</span>
+    </div>
+
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data" id="form-colaborador">
+            {% csrf_token %}
+
+            <!-- Tabs -->
+            <div class="tabs">
+                <div class="tabs-header">
+                    <button type="button" class="tab-btn active" data-tab="tab-pessoais">Dados Pessoais</button>
+                    <button type="button" class="tab-btn" data-tab="tab-documentos">Documentos</button>
+                    <button type="button" class="tab-btn" data-tab="tab-contrato">Contrato</button>
+                    <button type="button" class="tab-btn" data-tab="tab-beneficios">Benefícios</button>
+                </div>
+
+                <!-- Tab: Dados Pessoais -->
+                <div class="tab-content active" id="tab-pessoais">
+                    <!-- Foto e Empresa -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Foto</label>
+                            <div class="photo-upload" onclick="document.getElementById('id_foto').click()">
+                                {% if form.instance.foto %}
+                                <img src="{{ form.instance.foto.url }}" alt="Foto" id="foto-preview">
+                                {% else %}
+                                <span class="material-symbols-outlined" id="foto-icon">person</span>
+                                <img src="" alt="Foto" id="foto-preview" style="display: none;">
+                                {% endif %}
+                            </div>
+                            <input type="file" name="foto" id="id_foto" accept="image/*" style="display: none;"
+                                   onchange="previewFoto(this)">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Empresa</label>
+                            <select name="empresa" class="form-control">
+                                <option value="">Selecione...</option>
+                                {% for empresa in empresas %}
+                                <option value="{{ empresa.id }}" {% if form.instance.empresa_id == empresa.id %}selected{% endif %}>
+                                    {{ empresa.razao_social }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Informações Básicas -->
+                    <div class="section">
+                        <div class="section-header">Informações Básicas</div>
+                        <div class="section-content">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Nome Completo *</label>
+                                    <input type="text" name="nome_completo" class="form-control" style="width: 400px;"
+                                           value="{{ form.instance.nome_completo|default:'' }}" required>
+                                </div>
+                                <div class="form-group">
+                                    <label>CPF *</label>
+                                    <input type="text" name="cpf" class="form-control"
+                                           value="{{ form.instance.cpf|default:'' }}"
+                                           placeholder="000.000.000-00" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Data de Nascimento</label>
+                                    <input type="date" name="data_nascimento" class="form-control"
+                                           value="{{ form.instance.data_nascimento|date:'Y-m-d'|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Sexo</label>
+                                    <select name="sexo" class="form-control">
+                                        <option value="">Selecione...</option>
+                                        <option value="MASCULINO" {% if form.instance.sexo == 'MASCULINO' %}selected{% endif %}>Masculino</option>
+                                        <option value="FEMININO" {% if form.instance.sexo == 'FEMININO' %}selected{% endif %}>Feminino</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Estado Civil</label>
+                                    <select name="estado_civil" class="form-control">
+                                        <option value="">Selecione...</option>
+                                        <option value="SOLTEIRO" {% if form.instance.estado_civil == 'SOLTEIRO' %}selected{% endif %}>Solteiro(a)</option>
+                                        <option value="CASADO" {% if form.instance.estado_civil == 'CASADO' %}selected{% endif %}>Casado(a)</option>
+                                        <option value="DIVORCIADO" {% if form.instance.estado_civil == 'DIVORCIADO' %}selected{% endif %}>Divorciado(a)</option>
+                                        <option value="VIUVO" {% if form.instance.estado_civil == 'VIUVO' %}selected{% endif %}>Viúvo(a)</option>
+                                        <option value="UNIAO_ESTAVEL" {% if form.instance.estado_civil == 'UNIAO_ESTAVEL' %}selected{% endif %}>União Estável</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contato -->
+                    <div class="section">
+                        <div class="section-header">Contato</div>
+                        <div class="section-content">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Telefone</label>
+                                    <input type="text" name="telefone" class="form-control"
+                                           value="{{ form.instance.telefone|default:'' }}"
+                                           placeholder="(00) 0000-0000">
+                                </div>
+                                <div class="form-group">
+                                    <label>Celular</label>
+                                    <input type="text" name="celular" class="form-control"
+                                           value="{{ form.instance.celular|default:'' }}"
+                                           placeholder="(00) 00000-0000">
+                                </div>
+                                <div class="form-group">
+                                    <label>E-mail</label>
+                                    <input type="email" name="email" class="form-control" style="width: 300px;"
+                                           value="{{ form.instance.email|default:'' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Endereço -->
+                    <div class="section">
+                        <div class="section-header">Endereço</div>
+                        <div class="section-content">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>CEP</label>
+                                    <input type="text" name="cep" class="form-control" style="width: 120px;"
+                                           value="{{ form.instance.cep|default:'' }}"
+                                           placeholder="00000-000">
+                                </div>
+                                <div class="form-group">
+                                    <label>Endereço</label>
+                                    <input type="text" name="endereco" class="form-control" style="width: 400px;"
+                                           value="{{ form.instance.endereco|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Número</label>
+                                    <input type="text" name="numero" class="form-control" style="width: 80px;"
+                                           value="{{ form.instance.numero|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Complemento</label>
+                                    <input type="text" name="complemento" class="form-control"
+                                           value="{{ form.instance.complemento|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Bairro</label>
+                                    <input type="text" name="bairro" class="form-control"
+                                           value="{{ form.instance.bairro|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Cidade</label>
+                                    <input type="text" name="cidade" class="form-control"
+                                           value="{{ form.instance.cidade|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>UF</label>
+                                    <input type="text" name="uf_endereco" class="form-control" style="width: 60px;" maxlength="2"
+                                           value="{{ form.instance.uf_endereco|default:'' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Documentos -->
+                <div class="tab-content" id="tab-documentos">
+                    <div class="section">
+                        <div class="section-header">Documentos Principais</div>
+                        <div class="section-content">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>RG</label>
+                                    <input type="text" name="rg" class="form-control"
+                                           value="{{ form.instance.rg|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Órgão Emissor</label>
+                                    <input type="text" name="orgao_emissor_rg" class="form-control" style="width: 100px;"
+                                           value="{{ form.instance.orgao_emissor_rg|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>UF RG</label>
+                                    <input type="text" name="uf_rg" class="form-control" style="width: 60px;" maxlength="2"
+                                           value="{{ form.instance.uf_rg|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Data Emissão</label>
+                                    <input type="date" name="data_emissao_rg" class="form-control"
+                                           value="{{ form.instance.data_emissao_rg|date:'Y-m-d'|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Carteira Profissional</label>
+                                    <input type="text" name="carteira_profissional" class="form-control"
+                                           value="{{ form.instance.carteira_profissional|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Série</label>
+                                    <input type="text" name="serie_carteira" class="form-control" style="width: 80px;"
+                                           value="{{ form.instance.serie_carteira|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>UF</label>
+                                    <input type="text" name="uf_carteira" class="form-control" style="width: 60px;" maxlength="2"
+                                           value="{{ form.instance.uf_carteira|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>PIS</label>
+                                    <input type="text" name="pis" class="form-control"
+                                           value="{{ form.instance.pis|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Data Cadastramento</label>
+                                    <input type="date" name="data_cadastramento_pis" class="form-control"
+                                           value="{{ form.instance.data_cadastramento_pis|date:'Y-m-d'|default:'' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">CNH</div>
+                        <div class="section-content">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Número CNH</label>
+                                    <input type="text" name="habilitacao" class="form-control"
+                                           value="{{ form.instance.habilitacao|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Categoria</label>
+                                    <input type="text" name="tipo_cnh" class="form-control" style="width: 80px;"
+                                           value="{{ form.instance.tipo_cnh|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Data Expedição</label>
+                                    <input type="date" name="data_expedicao_cnh" class="form-control"
+                                           value="{{ form.instance.data_expedicao_cnh|date:'Y-m-d'|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Validade</label>
+                                    <input type="date" name="validade_cnh" class="form-control"
+                                           value="{{ form.instance.validade_cnh|date:'Y-m-d'|default:'' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Contrato -->
+                <div class="tab-content" id="tab-contrato">
+                    <div class="section">
+                        <div class="section-header">Dados do Contrato</div>
+                        <div class="section-content">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Data de Admissão</label>
+                                    <input type="date" name="data_admissao" class="form-control"
+                                           value="{{ form.instance.data_admissao|date:'Y-m-d'|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Função</label>
+                                    <input type="text" name="funcao" class="form-control" style="width: 250px;"
+                                           value="{{ form.instance.funcao|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Departamento</label>
+                                    <input type="text" name="departamento" class="form-control"
+                                           value="{{ form.instance.departamento|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Salário (R$)</label>
+                                    <input type="number" name="salario" class="form-control" step="0.01"
+                                           value="{{ form.instance.salario|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Forma de Pagamento</label>
+                                    <select name="forma_pagamento" class="form-control">
+                                        <option value="">Selecione...</option>
+                                        <option value="PIX" {% if form.instance.forma_pagamento == 'PIX' %}selected{% endif %}>PIX</option>
+                                        <option value="TRANSFERENCIA" {% if form.instance.forma_pagamento == 'TRANSFERENCIA' %}selected{% endif %}>Transferência</option>
+                                        <option value="DEPOSITO" {% if form.instance.forma_pagamento == 'DEPOSITO' %}selected{% endif %}>Depósito</option>
+                                        <option value="DINHEIRO" {% if form.instance.forma_pagamento == 'DINHEIRO' %}selected{% endif %}>Dinheiro</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Tipo de Contrato</label>
+                                    <select name="tipo_contrato" class="form-control">
+                                        <option value="">Selecione...</option>
+                                        <option value="CLT" {% if form.instance.tipo_contrato == 'CLT' %}selected{% endif %}>CLT</option>
+                                        <option value="EXPERIENCIA" {% if form.instance.tipo_contrato == 'EXPERIENCIA' %}selected{% endif %}>Experiência</option>
+                                        <option value="TEMPORARIO" {% if form.instance.tipo_contrato == 'TEMPORARIO' %}selected{% endif %}>Temporário</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Prazo Experiência (dias)</label>
+                                    <input type="number" name="prazo_experiencia" class="form-control" style="width: 120px;"
+                                           value="{{ form.instance.prazo_experiencia|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Prorrogação (dias)</label>
+                                    <input type="number" name="prorrogacao" class="form-control" style="width: 120px;"
+                                           value="{{ form.instance.prorrogacao|default:'' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">Horário de Trabalho</div>
+                        <div class="section-content">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Dias de Trabalho</label>
+                                    <input type="text" name="dias_trabalho" class="form-control" style="width: 300px;"
+                                           value="{{ form.instance.dias_trabalho|default:'' }}"
+                                           placeholder="Ex: Segunda a Sexta">
+                                </div>
+                                <div class="form-group">
+                                    <label>Horário</label>
+                                    <input type="text" name="horario_trabalho" class="form-control"
+                                           value="{{ form.instance.horario_trabalho|default:'' }}"
+                                           placeholder="Ex: 08:00 às 17:00">
+                                </div>
+                                <div class="form-group">
+                                    <label>Intervalo</label>
+                                    <input type="text" name="intervalo" class="form-control" style="width: 120px;"
+                                           value="{{ form.instance.intervalo|default:'' }}"
+                                           placeholder="Ex: 1h">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">Dados Bancários</div>
+                        <div class="section-content">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Tipo de Conta</label>
+                                    <select name="tipo_conta" class="form-control">
+                                        <option value="">Selecione...</option>
+                                        <option value="CORRENTE" {% if form.instance.tipo_conta == 'CORRENTE' %}selected{% endif %}>Corrente</option>
+                                        <option value="POUPANCA" {% if form.instance.tipo_conta == 'POUPANCA' %}selected{% endif %}>Poupança</option>
+                                        <option value="SALARIO" {% if form.instance.tipo_conta == 'SALARIO' %}selected{% endif %}>Salário</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Banco</label>
+                                    <input type="text" name="banco" class="form-control"
+                                           value="{{ form.instance.banco|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Agência</label>
+                                    <input type="text" name="agencia" class="form-control" style="width: 100px;"
+                                           value="{{ form.instance.agencia|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>Conta</label>
+                                    <input type="text" name="conta" class="form-control" style="width: 150px;"
+                                           value="{{ form.instance.conta|default:'' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab: Benefícios -->
+                <div class="tab-content" id="tab-beneficios">
+                    <div class="section">
+                        <div class="section-header">Vale Transporte</div>
+                        <div class="section-content">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" name="vale_transporte"
+                                               {% if form.instance.vale_transporte %}checked{% endif %}>
+                                        Recebe Vale Transporte
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label>Valor Diário (R$)</label>
+                                    <input type="number" name="vt_valor_diario" class="form-control" step="0.01"
+                                           value="{{ form.instance.vt_valor_diario|default:'' }}">
+                                </div>
+                                <div class="form-group">
+                                    <label>% Desconto</label>
+                                    <input type="number" name="vt_percentual_desconto" class="form-control" step="0.01" style="width: 100px;"
+                                           value="{{ form.instance.vt_percentual_desconto|default:'' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">Vale Refeição / Alimentação</div>
+                        <div class="section-content">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" name="vale_refeicao"
+                                               {% if form.instance.vale_refeicao %}checked{% endif %}>
+                                        Vale Refeição
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label>Valor Diário (R$)</label>
+                                    <input type="number" name="vr_valor_diario" class="form-control" step="0.01"
+                                           value="{{ form.instance.vr_valor_diario|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" name="vale_alimentacao"
+                                               {% if form.instance.vale_alimentacao %}checked{% endif %}>
+                                        Vale Alimentação
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label>Valor Diário (R$)</label>
+                                    <input type="number" name="va_valor_diario" class="form-control" step="0.01"
+                                           value="{{ form.instance.va_valor_diario|default:'' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">Assistência Médica/Odontológica</div>
+                        <div class="section-content">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" name="assistencia_medica"
+                                               {% if form.instance.assistencia_medica %}checked{% endif %}>
+                                        Assistência Médica
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label>Valor Desconto (R$)</label>
+                                    <input type="number" name="am_valor_desconto" class="form-control" step="0.01"
+                                           value="{{ form.instance.am_valor_desconto|default:'' }}">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>
+                                        <input type="checkbox" name="assistencia_odontologica"
+                                               {% if form.instance.assistencia_odontologica %}checked{% endif %}>
+                                        Assistência Odontológica
+                                    </label>
+                                </div>
+                                <div class="form-group">
+                                    <label>Valor Desconto (R$)</label>
+                                    <input type="number" name="ao_valor_desconto" class="form-control" step="0.01"
+                                           value="{{ form.instance.ao_valor_desconto|default:'' }}">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">Status</div>
+                        <div class="section-content">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label>Status</label>
+                                    <select name="status" class="form-control">
+                                        <option value="ATIVO" {% if form.instance.status == 'ATIVO' %}selected{% endif %}>Ativo</option>
+                                        <option value="INATIVO" {% if form.instance.status == 'INATIVO' %}selected{% endif %}>Inativo</option>
+                                        <option value="FERIAS" {% if form.instance.status == 'FERIAS' %}selected{% endif %}>Férias</option>
+                                        <option value="AFASTADO" {% if form.instance.status == 'AFASTADO' %}selected{% endif %}>Afastado</option>
+                                        <option value="DESLIGADO" {% if form.instance.status == 'DESLIGADO' %}selected{% endif %}>Desligado</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="section">
+                        <div class="section-header">Observações</div>
+                        <div class="section-content">
+                            <div class="form-group">
+                                <textarea name="observacoes_gerais" class="form-control form-control-wide" rows="4">{{ form.instance.observacoes_gerais|default:'' }}</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="btn-group mt-4">
+                <button type="submit" class="btn btn-success">
+                    <span class="material-symbols-outlined">save</span>
+                    Salvar
+                </button>
+                <a href="{% url 'colaboradores:colaborador_list' %}" class="btn btn-outline">
+                    <span class="material-symbols-outlined">close</span>
+                    Cancelar
+                </a>
+                {% if not form.instance.pk %}
+                <button type="reset" class="btn btn-outline">
+                    <span class="material-symbols-outlined">restart_alt</span>
+                    Limpar
+                </button>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function previewFoto(input) {
+    const preview = document.getElementById('foto-preview');
+    const icon = document.getElementById('foto-icon');
+
+    if (input.files && input.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.style.display = 'block';
+            if (icon) icon.style.display = 'none';
+        };
+        reader.readAsDataURL(input.files[0]);
+    }
+}
+</script>
+{% endblock %}
