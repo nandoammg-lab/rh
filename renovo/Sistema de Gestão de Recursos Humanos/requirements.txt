@@ -1,0 +1,26 @@
+# Sistema de Gestão de Recursos Humanos (SGRH) - Dependências
+# Para instalar: pip install -r requirements.txt
+
+# Framework principal
+flet==0.28.3
+flet-desktop==0.28.3
+flet-cli==0.28.3
+
+# Compilação
+pyinstaller==6.17.0
+pyinstaller-hooks-contrib==2025.9
+
+# Manipulação de dados
+pandas==2.3.3
+numpy==2.3.3
+openpyxl==3.1.5
+
+# Geração de documentos
+reportlab==4.4.5
+pillow==12.0.0
+
+# Manipulação de datas
+python-dateutil==2.9.0.post0
+
+# Utilitários
+requests==2.32.5

@@ -1,0 +1,44 @@
+# Renovo ERP - Dependências Unificadas
+# Para instalar: pip install -r requirements.txt
+
+# ============================================
+# BANCO DE DADOS - MySQL/AWS RDS
+# ============================================
+SQLAlchemy==2.0.36
+PyMySQL==1.1.1
+cryptography==44.0.0
+alembic==1.14.0
+python-dotenv==1.0.1
+
+# ============================================
+# FRAMEWORK DE INTERFACE
+# ============================================
+flet==0.28.3
+flet-desktop==0.28.3
+flet-cli==0.28.3
+
+# ============================================
+# COMPILAÇÃO
+# ============================================
+pyinstaller==6.17.0
+pyinstaller-hooks-contrib==2025.9
+
+# ============================================
+# MANIPULAÇÃO DE DADOS
+# ============================================
+pandas==2.3.3
+numpy==2.3.3
+openpyxl==3.1.5
+xlsxwriter>=3.1.0
+
+# ============================================
+# GERAÇÃO DE DOCUMENTOS
+# ============================================
+reportlab==4.4.5
+pillow==12.0.0
+
+# ============================================
+# UTILITÁRIOS
+# ============================================
+python-dateutil==2.9.0.post0
+requests==2.32.5

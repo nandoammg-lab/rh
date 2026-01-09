@@ -1,0 +1,8 @@
+{
+    "admin": {
+        "senha": "admin123",
+        "nome": "Administrador",
+        "cargo": "Administrador do Sistema",
+        "ativo": true
+    }
+}

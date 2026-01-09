@@ -1,0 +1,12 @@
+{
+  "dados_formulario": {
+    "deficiencia_tipo": "Nenhuma",
+    "vale_transporte": 0,
+    "vale_alimentacao": 0,
+    "assistencia_medica": 0,
+    "assistencia_odontologica": 0,
+    "seguro_vida": 0
+  },
+  "dependentes": [],
+  "foto_path": null
+}

@@ -1,0 +1,12 @@
+C:\Users\tiren\AppData\Local\Programs\Python\Python313\python.exe -m venv venv
+
+rmdir /s /q venv
+python -m venv venv (py -m venv venv)
+venv\Scripts\activate
+python -m ensurepip --upgrade
+python -m pip install --upgrade pip setuptools wheel
+python -m pip install pyinstaller reportlab pandas matplotlib
+pip install openpyxl ttkbootstrap
+
+
+pyinstaller --onefile --noconsole --clean --hidden-import=reportlab --hidden-import=pandas --hidden-import=matplotlib SistemaGestaoPatrimonial.py
